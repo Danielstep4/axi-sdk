@@ -2,6 +2,15 @@
 
 TypeScript SDK for building AXI-native CLIs, wrapping existing JSON or MCP backends in AXI, and integrating those tools into agent environments.
 
+## Attribution
+
+This SDK is an implementation project built around the AXI concept created by Kun Chen. The underlying AXI idea and design principles come from the upstream AXI project:
+
+- https://axi.md/
+- https://github.com/kunchenguid/axi
+
+This repo adapts those ideas into a small TypeScript SDK and local examples. Credit for the AXI concept, framing, and original design guidance belongs to the upstream project.
+
 ## What this repo is
 
 `axi-sdk` is a small monorepo with a few focused packages:

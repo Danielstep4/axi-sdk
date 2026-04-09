@@ -2,6 +2,11 @@
 
 This file shows concrete examples from the current MVP.
 
+The examples in this repo are implementations of the AXI concept created by Kun Chen. For the original concept, principles, and reference project, see:
+
+- https://axi.md/
+- https://github.com/kunchenguid/axi
+
 ## 1. A real AXI resource
 
 The notes example is implemented in [`examples/notes-axi/src/resource.ts`](./examples/notes-axi/src/resource.ts):

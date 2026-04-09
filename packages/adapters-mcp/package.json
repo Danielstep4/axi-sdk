@@ -1,0 +1,13 @@
+{
+  "name": "@axi/adapters-mcp",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/src/index.js"
+  },
+  "types": "./dist/src/index.d.ts",
+  "dependencies": {
+    "@axi/cli": "0.1.0",
+    "@axi/core": "0.1.0"
+  }
+}

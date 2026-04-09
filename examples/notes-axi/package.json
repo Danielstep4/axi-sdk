@@ -1,0 +1,13 @@
+{
+  "name": "notes-axi",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "notes-axi": "./dist/src/bin/notes-axi.js"
+  },
+  "dependencies": {
+    "@axi/cli": "0.1.0",
+    "@axi/core": "0.1.0",
+    "@axi/hooks": "0.1.0"
+  }
+}

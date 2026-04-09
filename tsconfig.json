@@ -1,0 +1,23 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./packages/core"
+    },
+    {
+      "path": "./packages/cli"
+    },
+    {
+      "path": "./packages/adapters-cli"
+    },
+    {
+      "path": "./packages/adapters-mcp"
+    },
+    {
+      "path": "./packages/hooks"
+    },
+    {
+      "path": "./examples/notes-axi"
+    }
+  ]
+}

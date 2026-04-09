@@ -1,0 +1,12 @@
+{
+  "name": "@axi/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/src/index.js"
+  },
+  "types": "./dist/src/index.d.ts",
+  "dependencies": {
+    "@axi/core": "0.1.0"
+  }
+}

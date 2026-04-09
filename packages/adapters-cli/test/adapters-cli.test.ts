@@ -53,7 +53,8 @@ test("wrapCommand narrows backend JSON into an AXI list", async () => {
   const exitCode = await run(issues, { argv: ["list"], io: sink.io });
 
   assert.equal(exitCode, 0);
-  assert.match(sink.stdout.join(""), /status: open/);
+  assert.match(sink.stdout.join(""), /items\[1\]\{id,title,status\}:/);
+  assert.match(sink.stdout.join(""), /7,"Ship it",open/);
   assert.doesNotMatch(sink.stdout.join(""), /hidden/);
 });
 

@@ -21,16 +21,8 @@ test("list picks a compact default schema", () => {
       "ok: true",
       "kind: list",
       "count: 1",
-      "fields:",
-      "  - id",
-      "  - title",
-      "  - status",
-      "  - summary",
-      "items:",
-      "  - id: n1",
-      "    title: \"First note\"",
-      "    status: open",
-      "    summary: \"A concise summary\"",
+      "items[1]{id,title,status,summary}:",
+      "  n1,\"First note\",open,\"A concise summary\"",
     ].join("\n"),
   );
 });
@@ -63,6 +55,20 @@ test("detail supports truncation and full output", () => {
     body: "full body",
     tags: ["cli", "axi"],
   });
+  assert.equal(
+    toon(full),
+    [
+      "ok: true",
+      "kind: detail",
+      "full: true",
+      "id: n1",
+      "title: \"First note\"",
+      "body: \"full body\"",
+      "tags[2]:",
+      "  cli",
+      "  axi",
+    ].join("\n"),
+  );
 });
 
 test("error and noop are explicit envelopes", () => {

@@ -39,6 +39,12 @@ Run the example CLI:
 npm run example -- list
 ```
 
+Run the git example CLI:
+
+```bash
+npm run example:git -- list
+```
+
 ## Small Example
 
 This is the basic shape of a CLI built with `@axi/cli`:
@@ -74,16 +80,8 @@ Example output:
 ok: true
 kind: list
 count: 1
-fields:
-  - id
-  - title
-  - status
-  - updatedAt
-items:
-  - id: 1
-    title: "Ship MVP"
-    status: saved
-    updatedAt: 2026-04-09T19:45:22.062Z
+items[1]{id,title,status,updatedAt}:
+  1,"Ship MVP",saved,2026-04-09T19:45:22.062Z
 ```
 
 ## Package Guide
@@ -163,6 +161,8 @@ The repo includes a complete example CLI:
 
 - [`examples/notes-axi/src/resource.ts`](./examples/notes-axi/src/resource.ts)
 - [`examples/notes-axi/src/bin/notes-axi.ts`](./examples/notes-axi/src/bin/notes-axi.ts)
+- [`examples/git-axi/src/resource.ts`](./examples/git-axi/src/resource.ts)
+- [`examples/git-axi/src/bin/git-axi.ts`](./examples/git-axi/src/bin/git-axi.ts)
 
 It shows:
 
@@ -171,6 +171,7 @@ It shows:
 - compact list output
 - `--full` detail output
 - file-backed local storage
+- wrapped `git` command output shaped into AXI
 
 ## More Examples
 

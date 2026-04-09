@@ -9,7 +9,8 @@
   "scripts": {
     "build": "tsc -b",
     "test": "npm run build && node --test packages/*/dist/test/*.test.js examples/*/dist/test/*.test.js",
-    "example": "node examples/notes-axi/dist/src/bin/notes-axi.js"
+    "example": "node examples/notes-axi/dist/src/bin/notes-axi.js",
+    "example:git": "node examples/git-axi/dist/src/bin/git-axi.js"
   },
   "devDependencies": {
     "@types/node": "^24.7.2",

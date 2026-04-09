@@ -1,0 +1,12 @@
+{
+  "name": "git-axi",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "git-axi": "./dist/src/bin/git-axi.js"
+  },
+  "dependencies": {
+    "@axi/cli": "0.1.0",
+    "@axi/core": "0.1.0"
+  }
+}

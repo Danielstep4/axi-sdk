@@ -83,15 +83,14 @@ node examples/notes-axi/dist/src/bin/notes-axi.js create '{"title":"Ship MVP","b
 ok: true
 kind: detail
 full: false
-item:
-  id: 1
-  title: "Ship MVP"
-  updatedAt: 2026-04-09T19:45:22.062Z
-  createdAt: 2026-04-09T19:45:22.062Z
-  body: "Build the framework"
-  tags:
-    - axi
-    - mvp
+id: 1
+title: "Ship MVP"
+updatedAt: 2026-04-09T19:45:22.062Z
+createdAt: 2026-04-09T19:45:22.062Z
+body: "Build the framework"
+tags[2]:
+  axi
+  mvp
 ```
 
 List notes:
@@ -104,16 +103,8 @@ node examples/notes-axi/dist/src/bin/notes-axi.js list
 ok: true
 kind: list
 count: 1
-fields:
-  - id
-  - title
-  - status
-  - updatedAt
-items:
-  - id: 1
-    title: "Ship MVP"
-    status: saved
-    updatedAt: 2026-04-09T19:45:22.062Z
+items[1]{id,title,status,updatedAt}:
+  1,"Ship MVP",saved,2026-04-09T19:45:22.062Z
 ```
 
 View full detail:
@@ -126,15 +117,14 @@ node examples/notes-axi/dist/src/bin/notes-axi.js view 1 --full
 ok: true
 kind: detail
 full: true
-item:
-  id: 1
-  title: "Ship MVP"
-  body: "Build the framework"
-  tags:
-    - axi
-    - mvp
-  createdAt: 2026-04-09T19:45:22.062Z
-  updatedAt: 2026-04-09T19:45:22.062Z
+id: 1
+title: "Ship MVP"
+body: "Build the framework"
+tags[2]:
+  axi
+  mvp
+createdAt: 2026-04-09T19:45:22.062Z
+updatedAt: 2026-04-09T19:45:22.062Z
 ```
 
 ## 3. A real existing-CLI wrapper
@@ -169,17 +159,9 @@ That turns verbose backend JSON into the compact AXI list shape:
 ok: true
 kind: list
 count: 2
-fields:
-  - id
-  - title
-  - status
-items:
-  - id: 17
-    title: "Fix auth redirect"
-    status: open
-  - id: 18
-    title: "Document CLI flags"
-    status: closed
+items[2]{id,title,status}:
+  17,"Fix auth redirect",open
+  18,"Document CLI flags",closed
 ```
 
 ## 4. A real MCP wrapper
@@ -231,4 +213,68 @@ Result:
 
 ```text
 "/usr/local/bin/notes-axi" hooks session-start --context "/workspace/.axi"
+```
+
+## 6. A real wrapped git CLI
+
+The git example is implemented in [`examples/git-axi/src/resource.ts`](./examples/git-axi/src/resource.ts):
+
+```ts
+import { detail, empty, error, list } from "@axi/core";
+import { resource } from "@axi/cli";
+
+import { getFileDetail, getRepoSummary } from "./git.js";
+
+export const gitResource = resource({
+  name: "git",
+  description: "Inspect local git state with AXI-friendly output",
+  home: async (context) => {
+    const repo = await getRepoSummary(context.io.cwd ?? process.cwd());
+
+    return detail({
+      repo: repo.repoName,
+      branch: repo.branch,
+      status: repo.status,
+      summary: repo.summary,
+    });
+  },
+  list: async (context) => {
+    const repo = await getRepoSummary(context.io.cwd ?? process.cwd());
+
+    if (repo.entries.length === 0) {
+      return empty("Working tree clean");
+    }
+
+    return list(
+      repo.entries.map((entry) => ({
+        id: entry.path,
+        title: entry.path,
+        status: entry.status,
+        summary: entry.summary,
+      })),
+      { fields: ["id", "title", "status", "summary"] },
+    );
+  },
+  view: async (id, context) => {
+    const repo = await getRepoSummary(context.io.cwd ?? process.cwd());
+    const file = await getFileDetail(repo, id);
+
+    return file ?? error(`Path not found in git status: ${id}`, { code: "USAGE" });
+  },
+});
+```
+
+With a dirty working tree:
+
+```bash
+node examples/git-axi/dist/src/bin/git-axi.js list
+```
+
+```text
+ok: true
+kind: list
+count: 2
+changes[2]{id,status,summary}:
+  README.md,modified,both
+  draft.txt,untracked,unstaged
 ```

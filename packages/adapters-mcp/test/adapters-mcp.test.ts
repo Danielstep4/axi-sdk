@@ -49,7 +49,8 @@ test("wrapMcpResource adapts MCP output into compact AXI output", async () => {
 
   assert.equal(listExitCode, 0);
   assert.match(sink.stdout.join(""), /kind: list/);
-  assert.match(sink.stdout.join(""), /title: "Write docs"/);
+  assert.match(sink.stdout.join(""), /items\[1\]\{id,title,status\}:/);
+  assert.match(sink.stdout.join(""), /t1,"Write docs",open/);
 });
 
 test("wrapMcpResource maps backend failures", async () => {

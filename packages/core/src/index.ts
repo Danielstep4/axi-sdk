@@ -30,8 +30,16 @@ function isRecord(value: unknown): value is RecordLike {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function isEnvelope(value: unknown): value is AxiEnvelope {
+  return isRecord(value) && typeof value.ok === "boolean" && typeof value.kind === "string";
+}
+
 function isPrimitive(value: unknown): value is AxiScalar {
   return value === null || ["string", "number", "boolean"].includes(typeof value);
+}
+
+function isPrimitiveRecord(value: unknown): value is Record<string, AxiScalar> {
+  return isRecord(value) && Object.values(value).every((entry) => isPrimitive(entry));
 }
 
 function toAxiValue(value: unknown, maxChars: number): AxiValue {
@@ -100,6 +108,41 @@ function serializeScalar(value: AxiScalar): string {
   return String(value);
 }
 
+function canCompactRecordArray(value: AxiValue[]): value is Array<Record<string, AxiScalar>> {
+  if (value.length === 0 || !value.every((entry) => isPrimitiveRecord(entry))) {
+    return false;
+  }
+
+  const firstKeys = Object.keys(value[0] ?? {});
+
+  return value.every((entry) => {
+    const keys = Object.keys(entry);
+    return keys.length === firstKeys.length && keys.every((key, index) => key === firstKeys[index]);
+  });
+}
+
+function serializeCompactRecordArray(label: string, value: Array<Record<string, AxiScalar>>, indent: number): string[] {
+  const prefix = "  ".repeat(indent);
+  const fields = Object.keys(value[0] ?? {});
+  const lines = [`${prefix}${label}[${value.length}]{${fields.join(",")}}:`];
+
+  for (const row of value) {
+    lines.push(`${prefix}  ${fields.map((field) => serializeScalar(row[field] ?? null)).join(",")}`);
+  }
+
+  return lines;
+}
+
+function serializePrimitiveArray(label: string, value: AxiScalar[], indent: number): string[] {
+  const prefix = "  ".repeat(indent);
+
+  if (value.length === 0) {
+    return [`${prefix}${label}[0]: []`];
+  }
+
+  return [`${prefix}${label}[${value.length}]:`, ...value.map((entry) => `${prefix}  ${serializeScalar(entry)}`)];
+}
+
 function serializeValue(value: AxiValue, indent: number): string[] {
   const prefix = "  ".repeat(indent);
 
@@ -140,6 +183,16 @@ function serializeValue(value: AxiValue, indent: number): string[] {
   const lines: string[] = [];
 
   for (const [key, entry] of entries) {
+    if (Array.isArray(entry) && entry.every((item) => isPrimitive(item))) {
+      lines.push(...serializePrimitiveArray(key, entry, indent));
+      continue;
+    }
+
+    if (Array.isArray(entry) && canCompactRecordArray(entry)) {
+      lines.push(...serializeCompactRecordArray(key, entry, indent));
+      continue;
+    }
+
     if (isPrimitive(entry)) {
       lines.push(`${prefix}${key}: ${serializeScalar(entry)}`);
       continue;
@@ -161,6 +214,26 @@ export function truncate(value: string, maxChars = 120): string {
 }
 
 export function toon(value: AxiValue | AxiEnvelope): string {
+  if (isEnvelope(value) && value.kind === "detail" && isRecord(value.item)) {
+    const { item, ...rest } = value as AxiEnvelope & { item: Record<string, AxiValue> };
+    return serializeValue({ ...rest, ...item } as unknown as AxiValue, 0).join("\n");
+  }
+
+  if (isEnvelope(value) && value.kind === "list" && Array.isArray(value.fields) && Array.isArray(value.items)) {
+    const { fields, items, ...rest } = value as AxiEnvelope & {
+      fields: string[];
+      items: Array<Record<string, AxiScalar>>;
+    };
+    const lines = serializeValue(rest as unknown as AxiValue, 0);
+
+    if (canCompactRecordArray(items)) {
+      lines.push(...serializeCompactRecordArray("items", items, 0));
+      return lines.join("\n");
+    }
+
+    return [...lines, ...serializeValue({ fields, items } as unknown as AxiValue, 0)].join("\n");
+  }
+
   return serializeValue(value as AxiValue, 0).join("\n");
 }
 
